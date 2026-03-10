@@ -18,9 +18,15 @@ function normalizeCountryLink(url) {
     const parsed = new URL(url, 'https://www.zara.com');
     const pathParts = parsed.pathname.split('/').filter(Boolean);
     if (!pathParts.length) return null;
-    const countryCode = pathParts[0].toUpperCase();
-    if (!/^[A-Z]{2}$/.test(countryCode)) return null;
-    return `https://www.zara.com/${countryCode.toLowerCase()}/`;
+    const countryCode = pathParts[0].toLowerCase();
+    if (!/^[a-z]{2}$/.test(countryCode)) return null;
+
+    const localeCode = pathParts[1]?.toLowerCase();
+    if (localeCode && /^[a-z]{2}$/.test(localeCode)) {
+      return `https://www.zara.com/${countryCode}/${localeCode}/`;
+    }
+
+    return `https://www.zara.com/${countryCode}/`;
   } catch {
     return null;
   }
@@ -37,7 +43,7 @@ function findLinks(html) {
 }
 
 export async function fetchCountryLinks() {
-  const targets = ['https://www.zara.com/', 'https://www.zara.com/country-selector', 'https://www.zara.com/tr/'];
+  const targets = ['https://www.zara.com/', 'https://www.zara.com/country-selector', 'https://www.zara.com/tr/tr/'];
   const links = new Set();
 
   for (const target of targets) {

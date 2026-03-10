@@ -27,5 +27,5 @@ npm start
 2. Uygulamayı `TELEGRAM_BOT_TOKEN` ile başlatın.
 3. Telegram'da:
    - `/start`
-   - `/follow https://www.zara.com/...`
+   - `/follow https://www.zara.com/tr/tr/...`
    - `/list`
