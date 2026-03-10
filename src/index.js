@@ -23,11 +23,24 @@ function json(res, statusCode, payload) {
 async function readBody(req) {
   let raw = '';
   for await (const chunk of req) raw += chunk;
-  return raw ? JSON.parse(raw) : {};
+
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    throw new Error('Geçersiz JSON payload.');
+  }
 }
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
+
+  if (req.method === 'GET' && url.pathname === '/favicon.ico') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
 
   if (req.method === 'GET' && url.pathname === '/api/health') return json(res, 200, { ok: true });
 
@@ -46,7 +59,10 @@ const server = createServer(async (req, res) => {
       const product = await tracker.addProduct(body.url, body.chatId);
       return json(res, 201, product);
     } catch (error) {
-      return json(res, 400, { error: error.message });
+      return json(res, 400, {
+        error: error.message,
+        hint: 'URL örneği: https://www.zara.com/tr/... (ürün detay sayfası olmalı)'
+      });
     }
   }
 

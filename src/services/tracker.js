@@ -2,6 +2,21 @@ import crypto from 'node:crypto';
 import { readStore, writeStore } from './storage.js';
 import { scrapeProduct } from './zaraScraper.js';
 
+function validateProductUrl(url) {
+  if (!url) throw new Error('Ürün URL alanı boş olamaz.');
+
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error('Geçerli bir URL girin. Örn: https://www.zara.com/tr/...');
+  }
+
+  if (!parsed.hostname.includes('zara.com')) {
+    throw new Error('Sadece zara.com ürün linkleri desteklenir.');
+  }
+}
+
 export function createTracker(config, botRef) {
   function listProducts() {
     return readStore(config.dataFile).products;
@@ -12,7 +27,8 @@ export function createTracker(config, botRef) {
   }
 
   async function addProduct(url, chatId) {
-    const snapshot = await scrapeProduct(url);
+    validateProductUrl(url);
+
     const products = listProducts();
     const existing = products.find((p) => p.url === url);
 
@@ -22,6 +38,13 @@ export function createTracker(config, botRef) {
       }
       saveProducts(products);
       return existing;
+    }
+
+    let snapshot;
+    try {
+      snapshot = await scrapeProduct(url);
+    } catch (error) {
+      throw new Error(`Ürün okunamadı. Linkin ürün detay sayfası olduğundan emin olun. Teknik detay: ${error.message}`);
     }
 
     const product = {

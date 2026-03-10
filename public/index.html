@@ -78,7 +78,7 @@
         });
         if (!res.ok) {
           const err = await res.json();
-          alert(err.error || 'Ürün eklenemedi');
+          alert((err.error || 'Ürün eklenemedi') + (err.hint ? '\n' + err.hint : ''));
           return;
         }
         url.value = '';
