@@ -1,0 +1,12 @@
+{
+  "name": "zaragram",
+  "version": "1.0.0",
+  "description": "Zara ürün fiyat takip web uygulaması + Telegram bot entegrasyonu",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "check": "node --check src/index.js && node --check src/services/zaraScraper.js && node --check src/services/tracker.js"
+  }
+}
