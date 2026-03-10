@@ -40,6 +40,22 @@ export function createTracker(config, botRef) {
     return listProducts().filter((p) => p.chatIds.includes(chatId));
   }
 
+  function unfollowProduct(url, chatId) {
+    const products = listProducts();
+    const product = products.find((p) => p.url === url);
+
+    if (!product) {
+      return { removed: false, reason: 'not-found' };
+    }
+
+    product.chatIds = product.chatIds.filter((id) => id !== chatId);
+
+    const nextProducts = products.filter((p) => p.id !== product.id || p.chatIds.length > 0);
+    saveProducts(nextProducts);
+
+    return { removed: true, orphanRemoved: product.chatIds.length === 0 };
+  }
+
   async function refreshPrices() {
     const products = listProducts();
 
@@ -70,6 +86,7 @@ export function createTracker(config, botRef) {
     addProduct,
     refreshPrices,
     listProducts,
-    getProductsByChatId
+    getProductsByChatId,
+    unfollowProduct
   };
 }

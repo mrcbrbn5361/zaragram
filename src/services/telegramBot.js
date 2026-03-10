@@ -1,3 +1,17 @@
+import { fetchCountryLinks } from './zaraScraper.js';
+
+const HELP_TEXT = [
+  'Zaragram komutları:',
+  '/start - Botu başlatır',
+  '/settings - Komutları listeler',
+  '/myid - Chat ID gösterir',
+  '/follow <zara-url> - Ürünü takip eder',
+  '/list - Takip ettiğin ürünleri listeler',
+  '/unfollow <zara-url> - Ürün takibini kapatır',
+  '/refresh - Fiyatları hemen günceller',
+  '/countries - Zara ülke/locale linklerinden örnekler'
+].join('\n');
+
 export function createTelegramBot(config, tracker) {
   if (!config.telegramBotToken) {
     return { isEnabled: false, notifyPriceDrop: async () => {}, sendMessage: async () => {} };
@@ -19,8 +33,13 @@ export function createTelegramBot(config, tracker) {
   }
 
   async function handleText(chatId, text) {
-    if (text.startsWith('/start')) {
-      await sendMessage(chatId, 'Zaragram aktif. /follow <url> ve /list komutlarını kullanabilirsiniz.');
+    if (text.startsWith('/start') || text.startsWith('/settings')) {
+      await sendMessage(chatId, HELP_TEXT);
+      return;
+    }
+
+    if (text.startsWith('/myid')) {
+      await sendMessage(chatId, `Chat ID: ${chatId}`);
       return;
     }
 
@@ -35,13 +54,44 @@ export function createTelegramBot(config, tracker) {
       return;
     }
 
+    if (text.startsWith('/unfollow ')) {
+      const url = text.replace('/unfollow ', '').trim();
+      const result = tracker.unfollowProduct(url, String(chatId));
+      if (!result.removed) {
+        await sendMessage(chatId, 'Bu URL için aktif takip bulunamadı.');
+        return;
+      }
+
+      const suffix = result.orphanRemoved ? ' (ürün sistemden de kaldırıldı)' : '';
+      await sendMessage(chatId, `Takip kapatıldı${suffix}`);
+      return;
+    }
+
     if (text.startsWith('/list')) {
       const products = tracker.getProductsByChatId(String(chatId));
       const msg = products.length
         ? products.map((p, i) => `${i + 1}. ${p.name}\n${p.price} ${p.currency}\n${p.url}`).join('\n\n')
         : 'Takip edilen ürün yok.';
       await sendMessage(chatId, msg);
+      return;
     }
+
+    if (text.startsWith('/refresh')) {
+      await sendMessage(chatId, 'Fiyatlar güncelleniyor...');
+      const products = await tracker.refreshPrices();
+      await sendMessage(chatId, `Tamamlandı. Güncellenen ürün sayısı: ${products.length}`);
+      return;
+    }
+
+    if (text.startsWith('/countries')) {
+      const links = await fetchCountryLinks();
+      const preview = links.slice(0, 20);
+      const suffix = links.length > preview.length ? `\n... ve ${links.length - preview.length} link daha` : '';
+      await sendMessage(chatId, `Toplam: ${links.length}\n${preview.join('\n')}${suffix}`);
+      return;
+    }
+
+    await sendMessage(chatId, 'Bilinmeyen komut. /settings ile komutları görebilirsin.');
   }
 
   setInterval(async () => {

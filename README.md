@@ -6,7 +6,7 @@ Zaragram, Zara ürünlerini web arayüzünden takip etmenizi ve fiyat düşünce
 - Zara ürün URL'sinden ürün adı, görseli ve fiyatını çekme.
 - Zara ülke bağlantılarını (`/api/countries`) otomatik tarama.
 - Web panelinden ürün ekleme ve fiyatları manuel güncelleme.
-- Telegram bot ile `/follow <url>` ve `/list` komutları.
+- Telegram bot ile ayar/komut yönetimi: `/settings`, `/myid`, `/follow`, `/unfollow`, `/list`, `/refresh`, `/countries`.
 - Periyodik fiyat kontrolü + fiyat düşüşü bildirimi.
 
 ## Kurulum
@@ -29,3 +29,8 @@ npm start
    - `/start`
    - `/follow https://www.zara.com/tr/tr/...`
    - `/list`
+   - `/unfollow https://www.zara.com/tr/tr/...`
+   - `/refresh`
+   - `/countries`
+   - `/settings`
+   - `/myid`
