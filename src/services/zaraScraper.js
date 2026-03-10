@@ -43,7 +43,7 @@ function findLinks(html) {
 }
 
 export async function fetchCountryLinks() {
-  const targets = ['https://www.zara.com/', 'https://www.zara.com/country-selector', 'https://www.zara.com/tr/tr/'];
+  const targets = ['https://www.zara.com/', 'https://www.zara.com/country-selector', 'https://www.zara.com/tr/'];
   const links = new Set();
 
   for (const target of targets) {
