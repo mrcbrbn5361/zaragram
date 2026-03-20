@@ -2,7 +2,8 @@ const events = [
   'TR fiyatı hedefe indi ve Telegram bildirimi hazırlandı.',
   'DE ve FR marketlerinde M beden yeniden stoğa girdi.',
   'US storefront için normalize ürün URL eşleşmesi tamamlandı.',
-  'Telegram Login doğrulaması ile web oturumu doğrulandı.'
+  'Telegram Login doğrulaması ile web oturumu doğrulandı.',
+  'Cloudflared public URL üzerinden panel dış erişime açıldı.'
 ];
 
 export function TrackingPreview() {

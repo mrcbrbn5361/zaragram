@@ -4,6 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:host": "node scripts/dev-host.mjs",
+    "dev:public": "node scripts/public-dev.mjs",
+    "tunnel": "node scripts/cloudflared-tunnel.mjs",
+    "termux:setup": "node scripts/setup-termux.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
