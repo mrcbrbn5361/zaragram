@@ -1,0 +1,16 @@
+{
+  "name": "zaragram",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "dev:host": "node scripts/dev-host.mjs",
+    "dev:public": "node scripts/public-dev.mjs",
+    "tunnel": "node scripts/cloudflared-tunnel.mjs",
+    "termux:setup": "node scripts/setup-termux.mjs",
+    "lint": "node --check server.mjs",
+    "typecheck": "node --check server.mjs",
+    "start": "node server.mjs"
+  }
+}

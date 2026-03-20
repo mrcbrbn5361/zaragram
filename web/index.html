@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZaraGram</title>
+    <link rel="stylesheet" href="/app.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero-panel">
+        <div class="eyebrow">ZARAGRAM / TELEGRAM-FIRST TRACKING</div>
+        <div class="hero-grid">
+          <div>
+            <h1>Zara tarzında çok ülkeli ürün takip paneli.</h1>
+            <p>
+              Telegram botu, web paneli, market karşılaştırması ve public cloudflared URL desteği tek uygulamada birleşir.
+            </p>
+          </div>
+          <div class="hero-card dark">
+            <span>Public mode</span>
+            <strong>Cloudflared ile herkese açık HTTPS erişimi</strong>
+            <p>Termux, Windows, Linux ve macOS terminal akışlarıyla uyumlu sade Node runtime.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary-grid" id="summary-grid"></section>
+
+      <section class="content-grid">
+        <div class="content-stack">
+          <section class="panel">
+            <div class="section-head compact">
+              <div>
+                <span class="mini-label">Tracking Intake</span>
+                <h2>Yeni takip oluştur</h2>
+              </div>
+            </div>
+            <form class="tracking-form" id="tracking-form">
+              <label>
+                <span>Telegram kullanıcı kimliği</span>
+                <input name="telegramUserId" placeholder="123456789" />
+              </label>
+              <label>
+                <span>Market</span>
+                <select name="marketCode" id="market-select"></select>
+              </label>
+              <label>
+                <span>Ürün linki</span>
+                <input name="productUrl" placeholder="https://www.zara.com/tr/en/structured-blazer-p01234567.html" required />
+              </label>
+              <label>
+                <span>Hedef fiyat</span>
+                <input name="priceTarget" placeholder="1999" />
+              </label>
+              <button type="submit">Takibi başlat</button>
+            </form>
+            <pre id="form-result" class="result-box"></pre>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <span class="mini-label">Markets</span>
+                <h2>Zara pazarları</h2>
+              </div>
+              <strong id="market-count"></strong>
+            </div>
+            <div class="market-grid" id="market-grid"></div>
+          </section>
+        </div>
+
+        <aside class="preview-panel">
+          <span class="mini-label light">Tracking Feed</span>
+          <h2>Son takipler</h2>
+          <div class="timeline" id="tracking-feed"></div>
+        </aside>
+      </section>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
