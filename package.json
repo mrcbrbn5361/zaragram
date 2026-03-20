@@ -3,21 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node node_modules/next/dist/bin/next dev",
     "dev:host": "node scripts/dev-host.mjs",
     "dev:public": "node scripts/public-dev.mjs",
     "tunnel": "node scripts/cloudflared-tunnel.mjs",
     "termux:setup": "node scripts/setup-termux.mjs",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "build": "node node_modules/next/dist/bin/next build",
+    "start": "node node_modules/next/dist/bin/next start",
+    "lint": "node node_modules/eslint/bin/eslint.js .",
+    "typecheck": "node node_modules/typescript/bin/tsc --noEmit"
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "next": "14.2.30",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "next": "15.5.2",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "telegraf": "^4.16.3",
     "zod": "^3.24.2"
   },
@@ -25,8 +25,8 @@
     "@types/node": "^22.13.10",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.30",
-    "typescript": "^5.8.2"
+    "eslint": "^9.35.0",
+    "eslint-config-next": "15.5.2",
+    "typescript": "^5.8.3"
   }
 }

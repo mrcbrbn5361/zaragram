@@ -1,8 +1,11 @@
 console.log(`Termux hızlı başlangıç:
-1) pkg update && pkg upgrade
-2) pkg install nodejs cloudflared git
-3) npm install
-4) cp .env.example .env.local
-5) npm run dev:public
+1) Mümkünse projeyi ~/zaragram altında çalıştır.
+2) pkg update && pkg upgrade
+3) pkg install nodejs git cloudflared
+4) npm install
+5) cp .env.example .env.local
+6) npm run dev
+7) Public erişim için npm run dev:public
 
-Not: Telegram webhook kullanacaksan cloudflared çıktısındaki public HTTPS URL'i bot webhook adresi olarak kullan.`);
+Eğer proje /storage/emulated/0 altında ise npm install yerine gerekirse 'npm install --no-bin-links' kullan.
+Bu repoda .npmrc içindeki bin-links=false ayarı Termux symlink sorunlarını azaltmak için eklendi.`);

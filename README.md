@@ -2,12 +2,12 @@
 
 ZaraGram, Zara'nın farklı ülke/pazar sitelerindeki ürünleri tek veri modelinde toplayıp Telegram botu ve Zara estetiğini referans alan web panel üzerinden takip etmek için hazırlanmış bir Next.js uygulama iskeletidir.
 
-## Bu güncellemede eklenenler
+## Bu güncellemede düzeltilen kritik noktalar
 
-- Cloudflared tünel ile web uygulamasını herkese açık HTTPS URL üzerinden yayınlama akışı.
-- Windows, macOS, Linux ve Termux terminallerinde aynı mantıkla çalışabilecek çapraz platform başlatma scriptleri.
-- `GET /api/health` sağlık kontrol ucu; tünel açıldıktan sonra canlı erişimi hızlıca doğrulamak için kullanılabilir.
-- `npm run dev:public` ile hem Next.js host süreci hem cloudflared tüneli tek komutta ayağa kaldırma desteği.
+- Termux ve Android paylaşımlı depolama alanlarında görülen `EACCES: permission denied, symlink ... node_modules/.bin/*` hatası için repo bazında `bin-links=false` ayarı eklendi.
+- `package.json` scriptleri artık `next`, `eslint` ve `tsc` ikililerine `.bin` symlink'i üzerinden değil, doğrudan `node_modules/...` altındaki gerçek CLI dosyaları üzerinden çalışıyor; böylece `next: not found` problemi engelleniyor.
+- Güvenlik/deprecation uyarılarını azaltmak için Next.js, React, ESLint ve TypeScript sürümleri güncellendi.
+- Windows, macOS, Linux ve Termux için cloudflared tabanlı public yayın akışı korunup daha güvenli hale getirildi.
 
 ## Mevcut ürün kapsamı
 
@@ -17,6 +17,7 @@ ZaraGram, Zara'nın farklı ülke/pazar sitelerindeki ürünleri tek veri modeli
 - Telegram Login doğrulama API'si (`/api/auth/telegram`) için HMAC tabanlı doğrulama yardımcıları.
 - Dosya tabanlı kalıcı tracking store (`.data/tracking-records.json`) sayesinde bot ve web arasında ortak veri modeli.
 - Zara'ya yakın görsel dilde hazırlanmış kontrol paneli, mimari akış blokları ve çoklu market görünümü.
+- Cloudflared ile public HTTPS URL üretme ve Telegram webhook'a bağlama akışı.
 
 ## API uçları
 
@@ -30,12 +31,48 @@ ZaraGram, Zara'nın farklı ülke/pazar sitelerindeki ürünleri tek veri modeli
 ## Scriptler
 
 ```bash
-npm run dev          # standart Next.js geliştirme
+npm run dev          # Next.js geliştirme
 npm run dev:host     # 0.0.0.0 üzerinde dinler
 npm run tunnel       # sadece cloudflared tüneli açar
 npm run dev:public   # web + cloudflared birlikte başlar
 npm run termux:setup # Termux için hızlı kurulum rehberi yazdırır
+npm run lint         # ESLint 9 ile lint
+npm run typecheck    # TypeScript kontrolü
 ```
+
+## Standart kurulum
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+## Termux için önerilen kurulum
+
+> En güvenli yöntem: projeyi `/data/data/com.termux/files/home/...` altında tut.
+> Android paylaşımlı klasörlerde (`/storage/emulated/0/...`) symlink kısıtları daha sık sorun çıkarır.
+
+```bash
+pkg update && pkg upgrade
+pkg install nodejs git cloudflared
+cd ~
+git clone <repo-url> zaragram
+cd zaragram
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+Eğer proje mecburen `Download/` gibi paylaşımlı depolama altındaysa:
+
+```bash
+npm install --no-bin-links
+cp .env.example .env.local
+npm run dev
+```
+
+Bu repo zaten `.npmrc` içinde `bin-links=false` ayarı içerdiği için Termux tarafında `.bin` symlink üretme ihtiyacını azaltır.
 
 ## Cloudflared ile herkese açık yayın
 
@@ -51,18 +88,17 @@ winget install Cloudflare.cloudflared
 brew install cloudflared
 ```
 
-**Linux (bash / zsh / fish)**
+**Linux**
 ```bash
-# dağıtıma göre cloudflared paketi kur
 cloudflared --version
 ```
 
 **Termux**
 ```bash
-pkg update && pkg install cloudflared
+pkg install cloudflared
 ```
 
-### 2. Projeyi çalıştır
+### 2. Public dev modunu başlat
 
 ```bash
 npm install
@@ -73,9 +109,9 @@ npm run dev:public
 Bu komut:
 - Next.js uygulamasını `0.0.0.0:3000` üzerinde başlatır.
 - Cloudflared ile public HTTPS URL üretir.
-- Terminal çıktısındaki public URL üzerinden herkese açık erişim sağlar.
+- Terminal çıktısındaki URL üzerinden web panelini herkese açar.
 
-### 3. Canlı olduğunu doğrula
+### 3. Sağlık kontrolü
 
 Lokal:
 ```bash
@@ -87,25 +123,13 @@ Public:
 curl https://<cloudflared-url>/api/health
 ```
 
-### 4. Telegram webhook için kullan
-
-Cloudflared çıktısındaki public HTTPS URL'i şu endpoint ile birleştir:
+### 4. Telegram webhook bağla
 
 ```text
 https://<cloudflared-url>/api/telegram
 ```
 
-Bunu Telegram bot webhook adresi olarak kullanabilirsin.
-
-## Termux akışı
-
-```bash
-pkg update && pkg upgrade
-pkg install nodejs cloudflared git
-npm install
-cp .env.example .env.local
-npm run dev:public
-```
+Cloudflared çıktısındaki public URL ile bu endpoint'i birleştirip Telegram webhook adresi olarak kullan.
 
 ## Örnek takip oluşturma isteği
 
@@ -130,10 +154,6 @@ TUNNEL_LOCAL_URL=http://127.0.0.1:3000
 TUNNEL_HOSTNAME=
 ```
 
-## Production için sonraki adımlar
+## Kaynak notu
 
-1. `lib/zara.ts` içindeki mock snapshot üreticisini canlı Zara veri çıkarıcısı ile değiştirmek.
-2. JSON store yerine PostgreSQL/Prisma kullanmak.
-3. Cloudflared yerine named tunnel + kalıcı hostname yapılandırması eklemek.
-4. Kullanıcı bazlı panel, favoriler, olay logları ve bildirim tercihleri eklemek.
-5. Telegram Login Widget istemci entegrasyonunu tamamlamak.
+Sürüm güncellemeleri için npm paket sayfalarındaki güncel yayın bilgilerinden yararlanıldı: Next.js `15.5.2`, `eslint-config-next 15.5.2`, React `19.1.1`, React DOM `19.1.1`, ESLint `9.35.0`, TypeScript `5.8.3`.

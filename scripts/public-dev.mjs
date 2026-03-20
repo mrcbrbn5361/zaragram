@@ -1,8 +1,7 @@
 import { spawn } from 'node:child_process';
 import process from 'node:process';
-import { getNpmCommand, commandExists, getCloudflaredInstallHint, isTermux } from './runtime-utils.mjs';
+import { commandExists, getCloudflaredInstallHint, isTermux } from './runtime-utils.mjs';
 
-const npmCommand = getNpmCommand();
 const port = process.env.PORT ?? '3000';
 const cloudflaredInstalled = await commandExists('cloudflared');
 
@@ -14,7 +13,7 @@ if (!cloudflaredInstalled) {
 console.log(`[zaragram] platform=${process.platform} termux=${isTermux() ? 'yes' : 'no'} port=${port}`);
 console.log('[zaragram] Next.js 0.0.0.0 üzerinde başlatılıyor ve ardından cloudflared tüneli açılıyor.');
 
-const web = spawn(npmCommand, ['run', 'dev:host'], {
+const web = spawn(process.execPath, ['scripts/dev-host.mjs'], {
   stdio: 'inherit',
   shell: false,
   env: process.env
