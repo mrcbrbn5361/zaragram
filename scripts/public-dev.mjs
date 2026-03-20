@@ -1,5 +1,4 @@
 import { spawn } from 'node:child_process';
-import process from 'node:process';
 import { commandExists, getCloudflaredInstallHint, isTermux } from './runtime-utils.mjs';
 
 const port = process.env.PORT ?? '3000';
@@ -11,19 +10,9 @@ if (!cloudflaredInstalled) {
 }
 
 console.log(`[zaragram] platform=${process.platform} termux=${isTermux() ? 'yes' : 'no'} port=${port}`);
-console.log('[zaragram] Next.js 0.0.0.0 üzerinde başlatılıyor ve ardından cloudflared tüneli açılıyor.');
 
-const web = spawn(process.execPath, ['scripts/dev-host.mjs'], {
-  stdio: 'inherit',
-  shell: false,
-  env: process.env
-});
-
-const tunnel = spawn(process.execPath, ['scripts/cloudflared-tunnel.mjs'], {
-  stdio: 'inherit',
-  shell: false,
-  env: process.env
-});
+const web = spawn(process.execPath, ['scripts/dev-host.mjs'], { stdio: 'inherit', shell: false, env: process.env });
+const tunnel = spawn(process.execPath, ['scripts/cloudflared-tunnel.mjs'], { stdio: 'inherit', shell: false, env: process.env });
 
 const shutdown = (signal) => {
   web.kill(signal);

@@ -6,10 +6,6 @@ export function isTermux() {
   return Boolean(process.env.TERMUX_VERSION || process.env.PREFIX?.includes('com.termux'));
 }
 
-export function getNpmCommand() {
-  return process.platform === 'win32' ? 'npm.cmd' : 'npm';
-}
-
 export async function commandExists(command) {
   const pathEntries = (process.env.PATH ?? '').split(path.delimiter);
   const extensions = process.platform === 'win32' ? ['.exe', '.cmd', '.bat', ''] : [''];
@@ -30,17 +26,8 @@ export async function commandExists(command) {
 }
 
 export function getCloudflaredInstallHint() {
-  if (isTermux()) {
-    return 'Termux: pkg update && pkg install cloudflared';
-  }
-
-  if (process.platform === 'win32') {
-    return 'Windows: winget install Cloudflare.cloudflared';
-  }
-
-  if (process.platform === 'darwin') {
-    return 'macOS: brew install cloudflared';
-  }
-
+  if (isTermux()) return 'Termux: pkg install cloudflared';
+  if (process.platform === 'win32') return 'Windows: winget install Cloudflare.cloudflared';
+  if (process.platform === 'darwin') return 'macOS: brew install cloudflared';
   return 'Linux: install cloudflared from Cloudflare package repo or your distro package manager';
 }

@@ -1,46 +1,33 @@
 # ZaraGram
 
-ZaraGram, Zara'nın farklı ülke/pazar sitelerindeki ürünleri tek veri modelinde toplayıp Telegram botu ve Zara estetiğini referans alan web panel üzerinden takip etmek için hazırlanmış bir Next.js uygulama iskeletidir.
+ZaraGram artık **sıfır harici runtime bağımlılığı** ile çalışan bir Node.js uygulamasıdır. Amaç; Zara ürünlerini çoklu ülkede takip eden, Telegram bot/web panel/cloudflared tünel akışını Termux dahil tüm yaygın terminal ortamlarında daha güvenilir çalıştırmaktır.
 
-## Bu güncellemede düzeltilen kritik noktalar
+## Neden Next.js kaldırıldı?
 
-- Termux ve Android paylaşımlı depolama alanlarında görülen `EACCES: permission denied, symlink ... node_modules/.bin/*` hatası için repo bazında `bin-links=false` ayarı eklendi.
-- `package.json` scriptleri artık `next`, `eslint` ve `tsc` ikililerine `.bin` symlink'i üzerinden değil, doğrudan `node_modules/...` altındaki gerçek CLI dosyaları üzerinden çalışıyor; böylece `next: not found` problemi engelleniyor.
-- Güvenlik/deprecation uyarılarını azaltmak için Next.js, React, ESLint ve TypeScript sürümleri güncellendi.
-- Windows, macOS, Linux ve Termux için cloudflared tabanlı public yayın akışı korunup daha güvenli hale getirildi.
+Sizin paylaştığınız Termux çıktısında iki kritik problem vardı:
 
-## Mevcut ürün kapsamı
+1. `npm install` sırasında `napi-postinstall: not found`
+2. Sonrasında `node_modules/next/dist/bin/next` bulunamadığı için `npm run dev` başarısızlığı
 
-- Çok ülkeli Zara market registry (`lib/countries.ts`) ve bölgesel özet API'si.
-- Ürün linkinden referans kodu çıkaran, markete göre normalize URL üreten ve karşılaştırmalı snapshot oluşturan Zara adapter katmanı.
-- Telegram bot akışı: market kodu + ürün linki + opsiyonel hedef fiyat ile takip oluşturma.
-- Telegram Login doğrulama API'si (`/api/auth/telegram`) için HMAC tabanlı doğrulama yardımcıları.
-- Dosya tabanlı kalıcı tracking store (`.data/tracking-records.json`) sayesinde bot ve web arasında ortak veri modeli.
-- Zara'ya yakın görsel dilde hazırlanmış kontrol paneli, mimari akış blokları ve çoklu market görünümü.
-- Cloudflared ile public HTTPS URL üretme ve Telegram webhook'a bağlama akışı.
+Bu sorunlar Next.js ve ilişkili bağımlılık zincirinin Termux + paylaşımlı Android depolama kombinasyonunda kırılgan hale gelmesinden kaynaklanıyordu. Bu yüzden uygulama, **vanilla Node HTTP server + static web UI** mimarisine çevrildi.
 
-## API uçları
+## Bu sürümde ne var?
 
-- `GET /api/markets`: tüm pazarlar ve bölgesel dağılım.
-- `GET /api/track`: kayıtlı takipler ve dashboard metrikleri.
-- `POST /api/track`: yeni takip oluşturur.
-- `POST /api/telegram`: Telegram webhook giriş noktası.
-- `POST /api/auth/telegram`: Telegram Login Widget doğrulaması.
-- `GET /api/health`: lokal veya public ortam sağlık kontrolü.
+- Harici çalışma zamanı bağımlılığı olmayan Node sunucusu (`server.mjs`)
+- Web paneli için static HTML/CSS/JS (`web/`)
+- API uçları:
+  - `GET /api/health`
+  - `GET /api/markets`
+  - `GET /api/track`
+  - `POST /api/track`
+  - `POST /api/telegram`
+  - `POST /api/auth/telegram`
+- Dosya tabanlı takip kayıt sistemi (`.data/tracking-records.json`)
+- Zara market registry, mock ürün normalize edici ve Telegram update işleyici
+- Cloudflared ile public HTTPS yayın akışı
+- Windows / macOS / Linux / Termux uyumlu yardımcı scriptler
 
-## Scriptler
-
-```bash
-npm run dev          # Next.js geliştirme
-npm run dev:host     # 0.0.0.0 üzerinde dinler
-npm run tunnel       # sadece cloudflared tüneli açar
-npm run dev:public   # web + cloudflared birlikte başlar
-npm run termux:setup # Termux için hızlı kurulum rehberi yazdırır
-npm run lint         # ESLint 9 ile lint
-npm run typecheck    # TypeScript kontrolü
-```
-
-## Standart kurulum
+## Kurulum
 
 ```bash
 npm install
@@ -48,10 +35,9 @@ cp .env.example .env.local
 npm run dev
 ```
 
-## Termux için önerilen kurulum
+> Bu projede harici paket bulunmadığı için `npm install` hızlı tamamlanır ve Next.js benzeri postinstall problemleri yaşatmaz.
 
-> En güvenli yöntem: projeyi `/data/data/com.termux/files/home/...` altında tut.
-> Android paylaşımlı klasörlerde (`/storage/emulated/0/...`) symlink kısıtları daha sık sorun çıkarır.
+## Termux kurulumu
 
 ```bash
 pkg update && pkg upgrade
@@ -64,77 +50,27 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Eğer proje mecburen `Download/` gibi paylaşımlı depolama altındaysa:
+## Public yayın (cloudflared)
 
 ```bash
-npm install --no-bin-links
-cp .env.example .env.local
-npm run dev
-```
-
-Bu repo zaten `.npmrc` içinde `bin-links=false` ayarı içerdiği için Termux tarafında `.bin` symlink üretme ihtiyacını azaltır.
-
-## Cloudflared ile herkese açık yayın
-
-### 1. Cloudflared kur
-
-**Windows (PowerShell / CMD)**
-```powershell
-winget install Cloudflare.cloudflared
-```
-
-**macOS (Terminal)**
-```bash
-brew install cloudflared
-```
-
-**Linux**
-```bash
-cloudflared --version
-```
-
-**Termux**
-```bash
-pkg install cloudflared
-```
-
-### 2. Public dev modunu başlat
-
-```bash
-npm install
-cp .env.example .env.local
 npm run dev:public
 ```
 
 Bu komut:
-- Next.js uygulamasını `0.0.0.0:3000` üzerinde başlatır.
-- Cloudflared ile public HTTPS URL üretir.
-- Terminal çıktısındaki URL üzerinden web panelini herkese açar.
+- Node web sunucusunu başlatır
+- cloudflared ile HTTPS public URL açar
+- Telegram webhook için kullanabileceğiniz public endpoint sağlar
 
-### 3. Sağlık kontrolü
-
-Lokal:
-```bash
-curl http://127.0.0.1:3000/api/health
-```
-
-Public:
-```bash
-curl https://<cloudflared-url>/api/health
-```
-
-### 4. Telegram webhook bağla
+Webhook örneği:
 
 ```text
 https://<cloudflared-url>/api/telegram
 ```
 
-Cloudflared çıktısındaki public URL ile bu endpoint'i birleştirip Telegram webhook adresi olarak kullan.
-
-## Örnek takip oluşturma isteği
+## API örneği
 
 ```bash
-curl -X POST http://localhost:3000/api/track \
+curl -X POST http://127.0.0.1:3000/api/track \
   -H 'content-type: application/json' \
   -d '{
     "marketCode": "TR",
@@ -153,7 +89,3 @@ PORT=3000
 TUNNEL_LOCAL_URL=http://127.0.0.1:3000
 TUNNEL_HOSTNAME=
 ```
-
-## Kaynak notu
-
-Sürüm güncellemeleri için npm paket sayfalarındaki güncel yayın bilgilerinden yararlanıldı: Next.js `15.5.2`, `eslint-config-next 15.5.2`, React `19.1.1`, React DOM `19.1.1`, ESLint `9.35.0`, TypeScript `5.8.3`.

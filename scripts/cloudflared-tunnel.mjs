@@ -10,19 +10,6 @@ if (!(await commandExists('cloudflared'))) {
   process.exit(1);
 }
 
-const args = tunnelHostname
-  ? ['tunnel', '--url', localUrl, '--hostname', tunnelHostname]
-  : ['tunnel', '--url', localUrl];
-
-console.log(`[zaragram] cloudflared başlatılıyor → ${localUrl}`);
-if (tunnelHostname) {
-  console.log(`[zaragram] sabit hostname isteği: ${tunnelHostname}`);
-}
-
-const child = spawn('cloudflared', args, {
-  stdio: 'inherit',
-  shell: false,
-  env: process.env
-});
-
+const args = tunnelHostname ? ['tunnel', '--url', localUrl, '--hostname', tunnelHostname] : ['tunnel', '--url', localUrl];
+const child = spawn('cloudflared', args, { stdio: 'inherit', shell: false, env: process.env });
 child.on('exit', (code) => process.exit(code ?? 0));

@@ -1,11 +1,12 @@
 import { spawn } from 'node:child_process';
 
-const port = process.env.PORT ?? '3000';
-
-const child = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'dev', '--hostname', '0.0.0.0', '--port', port], {
+const child = spawn(process.execPath, ['server.mjs'], {
   stdio: 'inherit',
   shell: false,
-  env: process.env
+  env: {
+    ...process.env,
+    HOST: '0.0.0.0'
+  }
 });
 
 child.on('exit', (code) => process.exit(code ?? 0));

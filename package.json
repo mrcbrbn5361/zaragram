@@ -1,32 +1,16 @@
 {
   "name": "zaragram",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "node node_modules/next/dist/bin/next dev",
+    "dev": "node server.mjs",
     "dev:host": "node scripts/dev-host.mjs",
     "dev:public": "node scripts/public-dev.mjs",
     "tunnel": "node scripts/cloudflared-tunnel.mjs",
     "termux:setup": "node scripts/setup-termux.mjs",
-    "build": "node node_modules/next/dist/bin/next build",
-    "start": "node node_modules/next/dist/bin/next start",
-    "lint": "node node_modules/eslint/bin/eslint.js .",
-    "typecheck": "node node_modules/typescript/bin/tsc --noEmit"
-  },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "next": "15.5.2",
-    "react": "19.1.1",
-    "react-dom": "19.1.1",
-    "telegraf": "^4.16.3",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@types/node": "^22.13.10",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "eslint": "^9.35.0",
-    "eslint-config-next": "15.5.2",
-    "typescript": "^5.8.3"
+    "lint": "node --check server.mjs",
+    "typecheck": "node --check server.mjs",
+    "start": "node server.mjs"
   }
 }
