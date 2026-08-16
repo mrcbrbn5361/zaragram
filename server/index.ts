@@ -9,6 +9,24 @@ export const app = express();
 const server = createServer(app);
 app.use(express.json({ limit: "32kb" }));
 
+const PUBLIC_URL = process.env.PUBLIC_URL || "https://zaragram.vercel.app";
+
+async function configureTelegramWebhook() {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token || process.env.VERCEL !== "1") return;
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ url: `${PUBLIC_URL}/api/telegram/webhook`, allowed_updates: ["message"] }),
+    });
+  } catch {
+    // Telegram bağlantısı sonraki cold start'ta yeniden denenir.
+  }
+}
+
+void configureTelegramWebhook();
+
 const MARKETS = [
   { code: "TR", slug: "tr", name: "Türkiye", language: "tr", currency: "TRY", symbol: "₺" },
 ];
