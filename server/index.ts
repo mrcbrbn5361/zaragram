@@ -11,17 +11,6 @@ app.use(express.json({ limit: "32kb" }));
 
 const MARKETS = [
   { code: "TR", slug: "tr", name: "Türkiye", language: "tr", currency: "TRY", symbol: "₺" },
-  { code: "ES", slug: "es", name: "İspanya", language: "es", currency: "EUR", symbol: "€" },
-  { code: "US", slug: "us", name: "ABD", language: "en", currency: "USD", symbol: "$" },
-  { code: "GB", slug: "uk", name: "Birleşik Krallık", language: "en", currency: "GBP", symbol: "£" },
-  { code: "DE", slug: "de", name: "Almanya", language: "de", currency: "EUR", symbol: "€" },
-  { code: "FR", slug: "fr", name: "Fransa", language: "fr", currency: "EUR", symbol: "€" },
-  { code: "IT", slug: "it", name: "İtalya", language: "it", currency: "EUR", symbol: "€" },
-  { code: "AE", slug: "ae", name: "Birleşik Arap Emirlikleri", language: "ar", currency: "AED", symbol: "د.إ" },
-  { code: "SA", slug: "sa", name: "Suudi Arabistan", language: "ar", currency: "SAR", symbol: "ر.س" },
-  { code: "JP", slug: "jp", name: "Japonya", language: "ja", currency: "JPY", symbol: "¥" },
-  { code: "AU", slug: "au", name: "Avustralya", language: "en", currency: "AUD", symbol: "A$" },
-  { code: "CA", slug: "ca", name: "Kanada", language: "en", currency: "CAD", symbol: "C$" },
 ];
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const lastFetch = new Map<string, number>();
